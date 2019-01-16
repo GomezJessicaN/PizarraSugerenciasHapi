@@ -20,6 +20,8 @@ export default class SugerenciaController {
 
     public async PostSugerencia(request: IPostSugerenciaRequest, h: Hapi.ResponseToolkit) {
       var sugerencia: any = { descripcion: request.payload.descripcion, idsugerencia: request.payload.idsugerencia};
+      if (this.EsSugerenciaSinCompletar(sugerencia)) {
+      } else {
       var value = await this.database.pgp.tx(async t => {
       var nuevaSugerencia : {idsugerencia: sugerencia["descripcion"]} = await t.one
       ('insert into public.sugerencias (descripcion) values ($1) returning idsugerencia', [sugerencia.descripcion]);
@@ -27,11 +29,15 @@ export default class SugerenciaController {
     });
     return value;
   }
+}
   public async GetSugerencia(request: IGetSugerenciaRequest, h: Hapi.ResponseToolkit){
     const out: any =await this.database.pgp.manyOrNone("select descripcion from sugerencias", []);
     if(!out){
       return Boom.notFound();
     }
 return out;
+  }
+  public async EsSugerenciaSinCompletar(sugerencia) {
+    return sugerencia.descripcion == "";
   }
 }
