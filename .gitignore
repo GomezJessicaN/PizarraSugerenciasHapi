@@ -44,3 +44,4 @@ typings
 config.production.json
 .env
 config.dev.json
+.nyc_output
